@@ -1016,8 +1016,40 @@ void AliAnalysisManager::ImportWrappers(TList *source)
          // Cd to the directory pointed by the container
          TString folder = cont->GetFolderName();
          if (!folder.IsNull()) f->cd(folder);
-         // Try to fetch first an object having the container name.
-         obj = gDirectory->Get(cont->GetName());
+         // Special treatment if the container has to read the full folder into a list
+         if (cont->GetType()->InheritsFrom(TCollection::Class())) {
+            if (cont->IsListToFolder() || (cont->GetProducer() && cont->GetProducer()->IsListsToFolders())) {
+               // We need to read all objects from the folder having the container name into a new collection
+               // make sure the folder exists
+               TString dirlist = cont->GetName();
+               if (!dirlist.IsNull() && gDirectory->cd(dirlist)) {
+                  // create the collection having the type stored by the container
+                  TCollection *coll = static_cast<TCollection*>(cont->GetType()->New());
+                  // loop all keys in the current directory and read objects into the new collection
+                  TIter next(gDirectory->GetListOfKeys());
+                  TKey *key;
+                  Int_t nread = 0;
+                  while ((key = (TKey*)next())) {
+                     TClass *cl = TClass::GetClass(key->GetClassName());
+                     // cannot handle recursive directories (there shouldn't be any)
+                     if (!cl->InheritsFrom(TDirectory::Class())) {
+                        coll->Add(key->ReadObj());
+                        nread++;
+                     }
+                  }
+                  obj = coll;
+                  if (fDebug > 1) {
+                     printf("=== container %s: %d objects read from: %s/%s/%s\n",
+                            dirlist.Data(), nread, filename, folder.Data(), dirlist.Data());
+                  }
+               } else {
+                  Error("ImportWrappers", "There is no directory named: %s inside %s/%s",
+                        dirlist.Data(), filename, folder.Data());
+               }
+            }
+         }
+         // Try to fetch an object having the container name.
+         if (!obj) obj = gDirectory->Get(cont->GetName());
          if (!obj) {
             Warning("ImportWrappers", "Could not import object of type:%s for container %s in file %s:%s.\n Object will not be available in Terminate(). Try if possible to name the output object as the container (%s) or to embed it in a TList", 
                     cont->GetType()->GetName(), cont->GetName(), filename, cont->GetFolderName(), cont->GetName());
@@ -1207,7 +1239,14 @@ void AliAnalysisManager::Terminate()
       // as the one of the container and we save as a single key.
          TCollection *coll = (TCollection*)output->GetData();
          coll->SetName(output->GetName());
-         coll->Write(output->GetName(), TObject::kSingleKey);
+         if (output->IsListToFolder() || (output->GetProducer() && output->GetProducer()->IsListsToFolders())) {
+            // Creaste a folder named as the container and write the collection content
+            gDirectory->mkdir(output->GetName());
+            gDirectory->cd(output->GetName());
+            coll->Write();
+         } else {
+            coll->Write(output->GetName(), TObject::kSingleKey);
+         }
       } else {
          if (output->GetData()->InheritsFrom(TTree::Class())) {
             TTree *tree = (TTree*)output->GetData();
