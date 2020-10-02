@@ -101,6 +101,7 @@ enum EAliAnalysisFlags {
    void                GetAnalysisTypeString(TString &type) const;                    
    Bool_t              GetAutoBranchLoading() const {return fAutoBranchHandling;} 
    Long64_t            GetCacheSize() const       {return fCacheSize;}
+   Long64_t            GetNMCevents() const       {return fNMCevents;}
    static const char  *GetCommonFileName()        {return fgCommonFileName.Data();}
    AliAnalysisDataContainer *
                        GetCommonInputContainer() const  {return fCommonInput;}
@@ -147,6 +148,7 @@ enum EAliAnalysisFlags {
    void                SetAutoBranchLoading(Bool_t b) { fAutoBranchHandling = b; }
    void                SetCurrentEntry(Long64_t entry)            {fCurrentEntry = entry;}
    void                SetCacheSize(Long64_t size)                {fCacheSize = size;}
+   void                SetNMCevents(Long64_t nevents)             {fNMCevents = nevents;}
    void                SetCollectSysInfoEach(Int_t nevents=0)     {fNSysInfo = nevents;}
    void                SetCollectThroughput(Bool_t flag)          {Changed(); TObject::SetBit(kCollectThroughput,flag);}
    static void         SetCommonFileName(const char *name)        {fgCommonFileName = name;}
@@ -280,6 +282,7 @@ private:
    Int_t                   fNcalls;              ///< Total number of calls (events) of ExecAnalysis
    Long64_t                fMaxEntries;          ///< Maximum number of entries
    Long64_t                fCacheSize;           ///< Cache size in bytes
+   Long64_t                fNMCevents;           ///< Maximum number of entries
    static Int_t            fPBUpdateFreq;        ///< Progress bar update freq.
    TString                 fStatisticsMsg;       ///< Statistics user message
    TString                 fRequestedBranches;   ///< Requested branch names
@@ -296,6 +299,6 @@ private:
    static AliAnalysisManager *fgAnalysisManager; //!<! static pointer to object instance
 
    bool                    fBreakExecutionChain; // Break the chain of task execution (it can be triggered by one of the subtasks)
-   ClassDef(AliAnalysisManager, 22)  // Analysis manager class
+   ClassDef(AliAnalysisManager, 23)  // Analysis manager class
 };   
 #endif

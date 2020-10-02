@@ -109,6 +109,7 @@ AliAnalysisManager::AliAnalysisManager(const char *name, const char *title)
                     fNcalls(0),
                     fMaxEntries(0),
                     fCacheSize(100000000), // default 100 MB
+                    fNMCevents(0),
                     fStatisticsMsg(),
                     fRequestedBranches(),
                     fStatistics(0),
@@ -183,6 +184,7 @@ AliAnalysisManager::AliAnalysisManager(const AliAnalysisManager& other)
                     fNcalls(other.fNcalls),
                     fMaxEntries(other.fMaxEntries),
                     fCacheSize(other.fCacheSize),
+                    fNMCevents(other.fNMCevents),
                     fStatisticsMsg(other.fStatisticsMsg),
                     fRequestedBranches(other.fRequestedBranches),
                     fStatistics(other.fStatistics),
@@ -254,6 +256,7 @@ AliAnalysisManager& AliAnalysisManager::operator=(const AliAnalysisManager& othe
       fNcalls     = other. fNcalls;
       fMaxEntries = other.fMaxEntries;
       fCacheSize = other.fCacheSize;
+      fNMCevents = other.fNMCevents;
       fStatisticsMsg = other.fStatisticsMsg;
       fRequestedBranches = other.fRequestedBranches;
       fStatistics = other.fStatistics;

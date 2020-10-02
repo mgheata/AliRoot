@@ -4071,6 +4071,7 @@ void AliAnalysisAlien::WriteAnalysisFile()
             if (handler->InheritsFrom("AliAODInputHandler")) TObject::SetBit(AliAnalysisGrid::kUseAOD);
          }
       }
+      if (fMCLoop) mgr->SetNMCevents(fNMCevents);
       TDirectory *cdir = gDirectory;
       TFile *file = TFile::Open(analysisFile, "RECREATE");
       file->SetCompressionSettings(ROOT::CompressionSettings(ROOT::kZLIB, 1));
